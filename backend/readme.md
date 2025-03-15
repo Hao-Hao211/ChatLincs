@@ -9,9 +9,9 @@
     * Upgrade the Machine type to `4-core`
     * Click `"Create codespace."`
     * It may take a few minutes for your Codespaces container to start. Once it does, you will see the IDE, terminal, and repository similar to VSCode.
-1. From the terminal in the project, navigate to `2-multimodal`:
+1. From the terminal in the project, navigate to `bakend`:
     ```
-    cd 2-multimodal
+    cd backend
     ```
     and start the docker image defined in `docker-compose.yml` by calling: 
     ```
