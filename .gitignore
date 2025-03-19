@@ -175,4 +175,15 @@ cython_debug/
 
 node_modules/
 
+# macOS system files
+.DS_Store
+
+# Next.js cache and build files
 .next/
+.next/cache/
+.next/static/
+.next/server/
+.next/trace
+.next/server/app-paths-manifest.json
+.next/server/vendor-chunks/
+.next/server/webpack-runtime.js
