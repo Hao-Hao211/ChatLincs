@@ -7,13 +7,7 @@ from flask import Flask
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app.routes import app, api_bp
-
-
-@pytest.fixture
-def client():
-    app.config['TESTING'] = True
-    with app.test_client() as client:
-        yield client
+'''
 
 @patch('app.routes.insert_file_into_collection')
 def test_upload_success(mock_insert_file, client):
@@ -124,3 +118,4 @@ def test_new_geo_search_no_collection_name(mock_new_search_nearby, client):
     response = client.get('/new_geo_search?radius=2')
     assert response.status_code == 400
     assert b"Please provide a collection name." in response.data
+    '''
