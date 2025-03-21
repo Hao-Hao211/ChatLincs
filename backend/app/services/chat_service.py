@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv, find_dotenv
 import weaviate
 
-from app.utils.helpers import url_to_base64, json_print
+from app.utils.helpers import json_print
 
 # client = weaviate.connect_to_local()
 
