@@ -6,8 +6,8 @@ import tempfile
 from flask import Blueprint, request, jsonify, render_template, Flask, send_from_directory, abort
 from werkzeug.security import safe_join
 
-from app.services.geo import search_nearby, create_map, initialize_database, save_map
-from app.services.file_service import insert_file_into_collection
+#from app.services.geo import search_nearby, create_map, initialize_database, save_map
+#from app.services.file_service import insert_file_into_collection
 from app.services.chat_service import retrieve_media, generate_response_multimodal_ollama, file_to_base64
 from flask_cors import CORS
 
@@ -18,7 +18,7 @@ from app.services.new_geo import new_search_nearby
 app = Flask(__name__)
 api_bp = Blueprint('api', __name__)
 CORS(api_bp)
-
+'''
 @api_bp.route('/upload', methods=['POST'])
 def upload():
     try:
@@ -39,7 +39,7 @@ def upload():
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
-
+'''
 # @api_bp.route('/chat', methods=['POST'])
 # def chat():
 #     data = request.get_json()
@@ -202,6 +202,7 @@ def chat():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+'''
 @api_bp.route('/geo_search', methods=['GET'])
 def geo_search():
     initialize_database()
@@ -228,6 +229,7 @@ def geo_search():
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+'''
 
 @api_bp.route('/collections', methods=['GET'])
 def get_collections():

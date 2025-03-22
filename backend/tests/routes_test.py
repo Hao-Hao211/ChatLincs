@@ -9,7 +9,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app.routes import app, api_bp, transcribe_audio
 
-
+'''
 # upload() : POST /upload
 
 @patch('app.routes.insert_file_into_collection')
@@ -36,6 +36,7 @@ def test_upload_no_collection_name(mock_insert_file, client):
     assert response.status_code == 400
     assert b"No collection name provided" in response.data
 
+'''
 # chat() : POST /chat
 
 @patch('app.routes.retrieve_media')
@@ -66,7 +67,7 @@ def test_chat_no_query(mock_generate_response, mock_retrieve_media, client):
     assert response.status_code == 400
     assert b"Please provide a query." in response.data
 
-
+'''
 # geo_search() : GET /geo_search
 
 
@@ -86,7 +87,7 @@ def test_geo_search_no_address(mock_search_nearby, client):
     assert response.status_code == 400
     assert b"Please provide an address." in response.data
 
-
+'''
 # get_collections() : GET /collections
 
 
