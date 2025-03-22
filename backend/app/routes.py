@@ -272,6 +272,7 @@ def new_upload():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 
+'''
 # 搜索附近数据接口
 @api_bp.route('/new_geo_search', methods=['GET'])
 def new_geo_search():
@@ -295,7 +296,7 @@ def new_geo_search():
         return jsonify({"error": results["error"]}), 400
 
     return jsonify({"results": results["results"]}), 200
-
+'''
 
 @api_bp.route('/geo_map', methods=['GET'])
 def geo_map():

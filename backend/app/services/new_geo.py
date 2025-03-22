@@ -63,12 +63,3 @@ def new_search_nearby(collection_name, keyword=None, latitude=None, longitude=No
 
     conn.close()
     return {"results": results}
-
-if __name__ == "__main__":
-    collection_name = "animal_test"  # 你可以更改为其他集合名称
-    new_initialize_database(collection_name)  # 初始化数据库
-    print(f"数据库 {collection_name} 已初始化。")
-
-    # 直接进行搜索，示例：查找 2km 内的“sunset”相关数据
-    result = new_search_nearby(collection_name, keyword="", address="The Regent's Park", radius_km=2)
-    print("搜索结果：", result)

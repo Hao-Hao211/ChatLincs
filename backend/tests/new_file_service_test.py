@@ -1,9 +1,25 @@
 import pytest
+import warnings
 from unittest.mock import patch, MagicMock, mock_open
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from app.services.new_file_service import add_media_to_database, insert_file
+from app.services.new_file_service import initialize_database, add_media_to_database, insert_file
+
+
+def test_initialize_database():
+    collection_name = 'test_collection'
+
+    initialize_database(collection_name)
+
+    assert os.path.exists(f'./databases/{collection_name}.db')
+    
+    try:
+        os.rmdir(f'./databases')
+    except:
+        warnings.warn(UserWarning(f'Failed to remove directory "./databases". Note: this does not affect the test result.'))
+        pass
+    
 
 @patch('app.services.new_file_service.sqlite3.connect')
 @patch('app.services.new_file_service.Nominatim.geocode')
@@ -84,10 +100,9 @@ def test_add_media_to_database_invalid_address(mock_geocode, mock_connect):
 @patch('builtins.open', new_callable=mock_open, read_data=b'test data')
 @patch('os.makedirs')
 @patch('os.path.exists', return_value=False)
-@patch('mimetypes.guess_type', return_value=('image/jpeg', None))
 @patch('app.services.new_file_service.add_media_to_database')
 @patch('app.services.new_file_service.initialize_database')
-def test_insert_file_success(mock_initialize_database, mock_add_media_to_database, mock_guess_type, mock_exists, mock_makedirs, mock_open, mock_connect):
+def test_insert_file_success(mock_initialize_database, mock_add_media_to_database, mock_exists, mock_makedirs, mock_open, mock_connect):
     mock_client = MagicMock()
     mock_connect.return_value = mock_client
     mock_client.collections.exists.return_value = False
@@ -96,12 +111,26 @@ def test_insert_file_success(mock_initialize_database, mock_add_media_to_databas
 
     file = MagicMock()
     file.filename = 'test.jpg'
-    collection_name = 'test_collection'
+    collection_name = 'test_collection' 
     description = 'test_description'
     address = 'The Regent\'s Park, London'
 
     insert_file(file, collection_name, description, address=address)
 
+    mock_client.collections.create.assert_called()
+    mock_collection.data.insert.assert_called()
+    mock_initialize_database.assert_called_with(collection_name)
+    mock_add_media_to_database.assert_called()
+    
+    file.filename = 'test.mp3'
+    insert_file(file, collection_name, description, address=address)
+    mock_client.collections.create.assert_called()
+    mock_collection.data.insert.assert_called()
+    mock_initialize_database.assert_called_with(collection_name)
+    mock_add_media_to_database.assert_called()
+    
+    file.filename = 'test.mp4'
+    insert_file(file, collection_name, description, address=address)
     mock_client.collections.create.assert_called()
     mock_collection.data.insert.assert_called()
     mock_initialize_database.assert_called_with(collection_name)

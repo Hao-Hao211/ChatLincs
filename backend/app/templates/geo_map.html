@@ -25,7 +25,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_1dd4f9beaa7ed1aa1aa81157300952a9 {
+                #map_083a93c2ca6b18642984e00c0b42f5ce {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -42,16 +42,16 @@
 <body>
     
     
-            <div class="folium-map" id="map_1dd4f9beaa7ed1aa1aa81157300952a9" ></div>
+            <div class="folium-map" id="map_083a93c2ca6b18642984e00c0b42f5ce" ></div>
         
 </body>
 <script>
     
     
-            var map_1dd4f9beaa7ed1aa1aa81157300952a9 = L.map(
-                "map_1dd4f9beaa7ed1aa1aa81157300952a9",
+            var map_083a93c2ca6b18642984e00c0b42f5ce = L.map(
+                "map_083a93c2ca6b18642984e00c0b42f5ce",
                 {
-                    center: [-29.4844624, 151.6580014],
+                    center: [51.5285582, -0.2416815],
                     crs: L.CRS.EPSG3857,
                     ...{
   "zoom": 14,
@@ -66,7 +66,7 @@
 
         
     
-            var tile_layer_ead31c3ab3cad9f897d59b91b969d593 = L.tileLayer(
+            var tile_layer_613afe0fb6218ed4e43d33aedeb03a1f = L.tileLayer(
                 "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {
   "minZoom": 0,
@@ -83,73 +83,39 @@
             );
         
     
-            tile_layer_ead31c3ab3cad9f897d59b91b969d593.addTo(map_1dd4f9beaa7ed1aa1aa81157300952a9);
+            tile_layer_613afe0fb6218ed4e43d33aedeb03a1f.addTo(map_083a93c2ca6b18642984e00c0b42f5ce);
         
     
-            var circle_cfcde14172ea93b3ba191e51cac017d3 = L.circle(
-                [-29.4844624, 151.6580014],
+            var circle_7eadbb88411d18f612c6e1dee1f5e451 = L.circle(
+                [51.5285582, -0.2416815],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.1, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2000.0, "stroke": true, "weight": 3}
-            ).addTo(map_1dd4f9beaa7ed1aa1aa81157300952a9);
+            ).addTo(map_083a93c2ca6b18642984e00c0b42f5ce);
         
     
-        var popup_a255977835e2f30d039c960723d43c97 = L.popup({
+        var popup_9547f62708972f81027d26f0f07ad397 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_3c99e8595989bba19343ccaaa5be8bfa = $(`<div id="html_3c99e8595989bba19343ccaaa5be8bfa" style="width: 100.0%; height: 100.0%;">Search radius：2.0 km</div>`)[0];
-                popup_a255977835e2f30d039c960723d43c97.setContent(html_3c99e8595989bba19343ccaaa5be8bfa);
+                var html_96f7fb2873cc1095d998b0a97cc72ff8 = $(`<div id="html_96f7fb2873cc1095d998b0a97cc72ff8" style="width: 100.0%; height: 100.0%;">Search radius：2.0 km</div>`)[0];
+                popup_9547f62708972f81027d26f0f07ad397.setContent(html_96f7fb2873cc1095d998b0a97cc72ff8);
             
         
 
-        circle_cfcde14172ea93b3ba191e51cac017d3.bindPopup(popup_a255977835e2f30d039c960723d43c97)
+        circle_7eadbb88411d18f612c6e1dee1f5e451.bindPopup(popup_9547f62708972f81027d26f0f07ad397)
         ;
 
         
     
     
-            var marker_cluster_36a586eff65bc2ec2ebc51e225335743 = L.markerClusterGroup(
+            var marker_cluster_cb81e0e1e1e402f3de1856148f6183b2 = L.markerClusterGroup(
                 {
 }
             );
         
     
-            var marker_1859bd162f5094a23589810517c6b71c = L.marker(
-                [-29.4844624, 151.6580014],
-                {
-}
-            ).addTo(marker_cluster_36a586eff65bc2ec2ebc51e225335743);
-        
-    
-        var popup_5385ec7f03e42118a4f1aff6fea91e6f = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_777cab5d94915de2d2b1db899e7258e9 = $(`<div id="html_777cab5d94915de2d2b1db899e7258e9" style="width: 100.0%; height: 100.0%;">         <b>Description：</b> kms ss<br>         <b>Address：</b> big ben<br>         <b>Distance：</b> 0.00 km         <br><img src="http://127.0.0.1:5000/uploads/2501.png" width="150"></div>`)[0];
-                popup_5385ec7f03e42118a4f1aff6fea91e6f.setContent(html_777cab5d94915de2d2b1db899e7258e9);
-            
-        
-
-        marker_1859bd162f5094a23589810517c6b71c.bindPopup(popup_5385ec7f03e42118a4f1aff6fea91e6f)
-        ;
-
-        
-    
-    
-            marker_1859bd162f5094a23589810517c6b71c.bindTooltip(
-                `<div>
-                     Click for details (0.00 km)
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            marker_cluster_36a586eff65bc2ec2ebc51e225335743.addTo(map_1dd4f9beaa7ed1aa1aa81157300952a9);
+            marker_cluster_cb81e0e1e1e402f3de1856148f6183b2.addTo(map_083a93c2ca6b18642984e00c0b42f5ce);
         
 </script>
 </html>

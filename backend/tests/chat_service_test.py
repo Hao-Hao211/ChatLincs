@@ -110,12 +110,29 @@ def test_retrieve_media_with_uploaded_file(tmp_path):
     mock_response = MagicMock()
     mock_response.objects = [MagicMock(properties={"name": "example_name", "path": "example_path"})]
     mock_collection.query.near_image.return_value = mock_response
+    mock_collection.query.near_media.return_value = mock_response
     mock_client.collections.get.return_value = mock_collection
     mock_client.collections.list_all.return_value = [collection_name]
 
     with patch('weaviate.connect_to_local', return_value=mock_client):
         results = retrieve_media(query, uploaded_file=uploaded_file, collection_name=collection_name)
 
+    assert len(results) == 1
+    assert results[0]["name"] == "example_name"
+    assert results[0]["path"] == "example_path"
+    
+    uploaded_file.filename = "test_file.mp3"
+    with patch('weaviate.connect_to_local', return_value=mock_client):
+        results = retrieve_media(query, uploaded_file=uploaded_file, collection_name=collection_name)
+        
+    assert len(results) == 1
+    assert results[0]["name"] == "example_name"
+    assert results[0]["path"] == "example_path"
+    
+    uploaded_file.filename = "test_file.mp4"
+    with patch('weaviate.connect_to_local', return_value=mock_client):
+        results = retrieve_media(query, uploaded_file=uploaded_file, collection_name=collection_name)
+    
     assert len(results) == 1
     assert results[0]["name"] == "example_name"
     assert results[0]["path"] == "example_path"
@@ -138,12 +155,29 @@ def test_retrieve_media_with_text_query_and_uploaded_file(tmp_path):
     mock_response_file.objects = [MagicMock(properties={"name": "example_name", "path": "example_path"})]
     mock_collection.query.near_image.return_value = mock_response_file
     mock_collection.query.near_text.return_value = mock_response_file
+    mock_collection.query.near_media.return_value = mock_response_file
     mock_client.collections.get.return_value = mock_collection
     mock_client.collections.list_all.return_value = [collection_name]
 
     with patch('weaviate.connect_to_local', return_value=mock_client):
         results = retrieve_media(query, uploaded_file=uploaded_file, collection_name=collection_name)
 
+    assert len(results) == 1
+    assert results[0]["name"] == "example_name"
+    assert results[0]["path"] == "example_path"
+    
+    uploaded_file.filename = "test_file.mp3"
+    with patch('weaviate.connect_to_local', return_value=mock_client):
+        results = retrieve_media(query, uploaded_file=uploaded_file, collection_name=collection_name)
+    
+    assert len(results) == 1
+    assert results[0]["name"] == "example_name"
+    assert results[0]["path"] == "example_path"
+    
+    uploaded_file.filename = "test_file.mp4"
+    with patch('weaviate.connect_to_local', return_value=mock_client):
+        results = retrieve_media(query, uploaded_file=uploaded_file, collection_name=collection_name)
+        
     assert len(results) == 1
     assert results[0]["name"] == "example_name"
     assert results[0]["path"] == "example_path"

@@ -1,3 +1,4 @@
+from io import BytesIO
 import os
 import base64
 import tempfile
@@ -36,7 +37,7 @@ def test_upload_no_collection_name(mock_insert_file, client):
     assert response.status_code == 400
     assert b"No collection name provided" in response.data
 
-'''
+
 # chat() : POST /chat
 
 @patch('app.routes.retrieve_media')
@@ -67,7 +68,7 @@ def test_chat_no_query(mock_generate_response, mock_retrieve_media, client):
     assert response.status_code == 400
     assert b"Please provide a query." in response.data
 
-'''
+
 # geo_search() : GET /geo_search
 
 
@@ -124,7 +125,22 @@ def test_new_upload_no_file(mock_insert_file, client):
     assert response.status_code == 400
     assert b"No file part in the request" in response.data
 
+@patch('app.routes.insert_file')
+def test_new_upload_manual_latitude_longitude(mock_insert_file, client):
+    test_latitude = 51.5285582
+    test_longitude = -0.2416815
+    data = {
+        'file': (MagicMock(filename='test.txt'), 'test.txt'),
+        'collection_name': 'test_collection',
+        'description': 'test description',
+        'latitude': test_latitude,
+        'longitude': test_longitude
+    }
+    response = client.post('/new_upload', data=data, content_type='multipart/form-data')
+    assert response.status_code == 200
+    assert b"success" in response.data
 
+'''
 # new_geo_search() : GET /new_geo_search
 
 
@@ -141,6 +157,14 @@ def test_new_geo_search_no_collection_name(mock_new_search_nearby, client):
     assert response.status_code == 400
     assert b"Please provide a collection name." in response.data
     
+@patch('app.routes.new_search_nearby')
+def test_new_geo_search_manual_latitude_longitude(mock_new_search_nearby, client):
+    test_latitude = 51.5285582
+    test_longitude = -0.2416815
+    response = client.get(f'/new_geo_search?collection_name=test_collection&latitude={test_latitude}&longitude={test_longitude}&radius=2')
+    assert response.status_code == 200
+
+'''
     
 # geo_map() : GET /geo_map
 
@@ -171,6 +195,13 @@ def test_geo_map_no_results(mock_save_geo_map, mock_create_empty_map, mock_new_s
     response = client.get('/geo_map?collection_name=test_collection&radius=2')
     assert response.status_code == 200
     
+@patch('app.routes.new_search_nearby')
+def test_geo_map_manual_latitude_longitude(mock_new_search_nearby, client):
+    test_latitude = 51.5285582
+    test_longitude = -0.2416815
+    response = client.get(f'/geo_map?collection_name=test_collection&latitude={test_latitude}&longitude={test_longitude}&radius=2')
+    assert response.status_code == 200
+    
     
 # uploaded_file() : GET /uploads/<path:filename>
 
@@ -196,3 +227,118 @@ def test_uploaded_file_success(client):
 def test_uploaded_file_not_found(client):
     response = client.get('/uploads/non_existent_file.txt')
     assert response.status_code == 404
+
+
+# chat() : POST /chat
+
+
+@patch('app.routes.retrieve_media')
+@patch('app.routes.generate_response_multimodal_ollama')
+def test_chat_success(mock_generate_response, mock_retrieve_media, client):
+    mock_generate_response.return_value = "Test response"
+    mock_retrieve_media.return_value = []
+
+    data = {
+        'query': 'test query',
+        'collection_name': 'test_collection',
+        'retrieve': 'false',
+        'session_id': 'default'
+    }
+    response = client.post('/chat', data=data)
+    assert response.status_code == 200
+    assert b"Test response" in response.data
+
+@patch('app.routes.retrieve_media')
+@patch('app.routes.generate_response_multimodal_ollama')
+def test_chat_no_query(mock_generate_response, mock_retrieve_media, client):
+    data = {
+        'collection_name': 'test_collection',
+        'retrieve': 'false',
+        'session_id': 'default'
+    }
+    response = client.post('/chat', data=data)
+    assert response.status_code == 400
+    assert b"Please provide a query." in response.data
+
+@patch('app.routes.retrieve_media')
+@patch('app.routes.generate_response_multimodal_ollama')
+def test_chat_with_uploaded_file(mock_generate_response, mock_retrieve_media, client):
+    mock_generate_response.return_value = "Test response"
+    mock_retrieve_media.return_value = []
+
+    data = {
+        'query': 'test query',
+        'collection_name': 'test_collection',
+        'retrieve': 'true',
+        'session_id': 'default',
+        'uploaded_file': (BytesIO(b"test file content"), 'test_file.txt')
+    }
+    response = client.post('/chat', data=data, content_type='multipart/form-data')
+    assert response.status_code == 200
+    assert b"Test response" in response.data
+
+@patch('app.routes.retrieve_media')
+@patch('app.routes.transcribe_audio')
+@patch('app.routes.generate_response_multimodal_ollama')
+def test_chat_with_audio_transcription(mock_generate_response, mock_transcribe_audio, mock_retrieve_media, client):
+    mock_generate_response.return_value = "Test response"
+    mock_transcribe_audio.return_value = "test audio transcription"
+    mock_retrieve_media.return_value = [{
+        "mediaType": "audio",
+        "audio": base64.b64encode(b"test audio content").decode('utf-8')
+    }]
+
+    data = {
+        'query': 'test query',
+        'collection_name': 'test_collection',
+        'retrieve': 'true',
+        'session_id': 'default'
+    }
+    response = client.post('/chat', data=data)
+    assert response.status_code == 200
+    assert b"Test response" in response.data
+    
+
+# transcribe_audio() : auxiliary function
+
+
+@patch('app.routes.whisper.load_model')
+def test_transcribe_audio_success(mock_load_model):
+    mock_model = MagicMock()
+    mock_load_model.return_value = mock_model
+    mock_model.transcribe.return_value = {"text": "test transcription"}
+
+    base64_audio = base64.b64encode(b"test audio content").decode('utf-8')
+    transcript = transcribe_audio(base64_audio)
+
+    assert transcript == "test transcription"
+    mock_load_model.assert_called_once()
+    mock_model.transcribe.assert_called_once()
+
+@patch('app.routes.whisper.load_model')
+def test_transcribe_audio_no_text(mock_load_model):
+    mock_model = MagicMock()
+    mock_load_model.return_value = mock_model
+    mock_model.transcribe.return_value = {}
+
+    base64_audio = base64.b64encode(b"test audio content").decode('utf-8')
+    transcript = transcribe_audio(base64_audio)
+
+    assert transcript == ""
+    mock_load_model.assert_called_once_with("small")
+    mock_model.transcribe.assert_called_once()
+
+@patch('app.routes.whisper.load_model')
+def test_transcribe_audio_exception(mock_load_model):
+    mock_model = MagicMock()
+    mock_load_model.return_value = mock_model
+    mock_model.transcribe.side_effect = Exception("Transcription error")
+
+    base64_audio = base64.b64encode(b"test audio content").decode('utf-8')
+
+    with pytest.raises(Exception) as excinfo:
+        transcribe_audio(base64_audio)
+
+    assert "Transcription error" in str(excinfo.value)
+    mock_load_model.assert_called_once_with("small")
+    mock_model.transcribe.assert_called_once()

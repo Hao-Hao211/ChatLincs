@@ -119,11 +119,3 @@ def insert_file(file, collection_name, description, address=None, latitude=None,
     add_media_to_database(collection_name, saved_path, description, address, latitude, longitude)
     print(f"文件 '{file_path}' 的信息已成功存储到数据库 '{collection_name}.db' 中。")
     client.close()
-
-# 测试代码
-if __name__ == '__main__':
-    file_path = "../test/test-cat.jpg"
-    collection_name = "animal_test"
-    description = "A cute dog picture"
-    address = "The Regent's Park, London"
-    insert_file(file_path, collection_name, description, address=address)
