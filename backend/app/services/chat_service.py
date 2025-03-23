@@ -179,7 +179,6 @@ def file_to_base64(path):
 #         print(f"An error occurred while communicating with the GPT-4 API: {e}")
 #         return f"An error occurred: {e}"
 
-# 新增：将 Flask 上传的文件转换为 base64（适用于 file-like 对象）
 def fileobj_to_base64(file_obj):
     file_obj.seek(0)
     data = file_obj.read()
@@ -187,29 +186,16 @@ def fileobj_to_base64(file_obj):
     return base64.b64encode(data).decode('utf-8')
 
 def retrieve_media(query, uploaded_file=None, collection_name=None):
-    """
-    根据查询文本与上传文件检索 Weaviate 数据库中的媒体
 
-    参数:
-        query (str): 查询文本
-        uploaded_file: 前端上传的文件（例如 flask.request.files 中的文件对象）
-        collection_name (str): 可选，指定集合名称
-
-    返回:
-        合并后的检索结果列表
-    """
     client = weaviate.connect_to_local()
 
-    # 获取需要搜索的集合（若指定集合，则只在该集合内搜索，否则遍历所有集合）
     if collection_name:
         collections = [(collection_name, client.collections.get(collection_name))]
     else:
         collections = [(name, client.collections.get(name)) for name in client.collections.list_all()]
 
-    # 准备返回字段，依据集合 schema 动态确定
     results = []
 
-    # 根据上传文件进行类别识别并转换为 base64
     file_base64 = None
     file_query_type = None
     media_type = None
@@ -232,7 +218,6 @@ def retrieve_media(query, uploaded_file=None, collection_name=None):
         available_properties = [prop.name for prop in schema.properties]
         return_properties = [prop for prop in ['name', 'path', 'mediaType', 'collection', 'image', 'audio', 'video'] if prop in available_properties]
 
-        # 如果上传文件存在且已识别类型，则先执行文件类型的搜索
         if file_base64 and file_query_type:
             if file_query_type == "near_image":
                 response_file = collection.query.near_image(
@@ -256,7 +241,6 @@ def retrieve_media(query, uploaded_file=None, collection_name=None):
                     json_print(item)
                     results.append(item)
 
-        # 再对文本 query 进行搜索（若 query 有值）
         elif query:
             response_text = collection.query.near_text(
                 query=query,
