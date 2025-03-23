@@ -4,7 +4,6 @@ from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
 
-# 初始化数据库（每个 collection 独立）
 def new_initialize_database(collection_name):
     db_path = f'./databases/{collection_name}.db'
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
@@ -24,20 +23,19 @@ def new_initialize_database(collection_name):
     conn.close()
 
 
-# 搜索范围内的数据
 def new_search_nearby(collection_name, keyword=None, latitude=None, longitude=None, address=None, radius_km=None):
     db_path = f'./databases/{collection_name}.db'
 
     if not os.path.exists(db_path):
         return {"error": f"Collection '{collection_name}' does not exist."}
 
-    geolocator = Nominatim(user_agent="geo_app")
+    geolocator = Nominatim(user_agent="ChatLincs/1.0 (haozhang2004@gmail.com)")
     if address:
         location = geolocator.geocode(address)
         if location:
             latitude, longitude = location.latitude, location.longitude
         else:
-            return {"error": f"无法找到地址: {address}"}
+            return {"error": f"Address not found: {address}"}
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()

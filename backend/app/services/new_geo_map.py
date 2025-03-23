@@ -6,16 +6,8 @@ from geopy import Nominatim
 
 
 def create_geo_map(results, center_lat=None, center_lon=None, address=None, radius_km=2):
-    """
-    通过 new_geo_search 结果创建交互式地图
-    :param results: 从 new_geo_search 获取的 JSON 数据
-    :param center_lat: 中心纬度
-    :param center_lon: 中心经度
-    :param radius_km: 显示的搜索半径
-    :return: folium Map 对象
-    """
     if not results:
-        raise ValueError("无有效的地图数据")
+        raise ValueError("Not valid data to create map")
 
     geolocator = Nominatim(user_agent="geo_app")
     if address:
@@ -23,7 +15,7 @@ def create_geo_map(results, center_lat=None, center_lon=None, address=None, radi
         if location:
             center_lat, center_lon = location.latitude, location.longitude
         else:
-            raise ValueError(f"无法找到地址: {address}")
+            raise ValueError(f"Address not found: {address}")
 
     # if center_lat is None or center_lon is None:
     #     center_lat, center_lon = results[0]['latitude'], results[0]['longitude']
@@ -41,7 +33,6 @@ def create_geo_map(results, center_lat=None, center_lon=None, address=None, radi
 
     marker_cluster = MarkerCluster().add_to(m)
     for data in results:
-        # 修正: 使用 `api.uploaded_file` 生成文件 URL
         file_url = url_for('api.uploaded_file', filename=os.path.basename(data["file_path"]), _external=True)
 
         popup_content = f"""
@@ -50,7 +41,6 @@ def create_geo_map(results, center_lat=None, center_lon=None, address=None, radi
         <b>Distance：</b> {data['distance_km']:.2f} km
         """
 
-        # 根据文件类型添加图片、视频或音频
         if data['file_path'].lower().endswith(('jpg', 'jpeg', 'png')):
             popup_content += f'<br><img src="{file_url}" width="150">'
         elif data['file_path'].lower().endswith(('mp4', 'webm', 'ogg')):
@@ -67,12 +57,6 @@ def create_geo_map(results, center_lat=None, center_lon=None, address=None, radi
     return m
 
 def save_geo_map(map_obj, filename="geo_map.html"):
-    """
-    保存地图到 templates 目录
-    :param map_obj: folium Map 对象
-    :param filename: 保存的 HTML 文件名
-    :return: 文件路径
-    """
     map_path = os.path.join(current_app.root_path, "templates", filename)
     os.makedirs(os.path.dirname(map_path), exist_ok=True)
     map_obj.save(map_path)
@@ -86,11 +70,10 @@ def create_empty_map(center_lat=None, center_lon=None, address=None, radius_km=2
         if location:
             center_lat, center_lon = location.latitude, location.longitude
         else:
-            raise ValueError(f"无法找到地址: {address}")
+            raise ValueError(f"Address not found: {address}")
 
     m = folium.Map(location=[center_lat, center_lon], zoom_start=14)
 
-    # 画出搜索范围
     folium.Circle(
         radius=radius_km * 1000,
         location=[center_lat, center_lon],
