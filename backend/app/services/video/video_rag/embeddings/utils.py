@@ -4,6 +4,9 @@ from tqdm import tqdm
 from pytubefix import YouTube, Stream
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import WebVTTFormatter
+from io import StringIO, BytesIO
+import PIL
+from PIL import Image
 
 def download_video(video_url, path='/tmp/'):
     print(f'Getting video information for {video_url}')
@@ -124,3 +127,15 @@ def bt_embedding_local2(prompt, base64_image):
 
     outputs = model(**encoding)
     return outputs.text_embeds[0].detach().cpu().numpy().tolist()
+
+# encoding image at given path or PIL Image using base64
+def encode_image(image_path_or_PIL_img):
+    if isinstance(image_path_or_PIL_img, PIL.Image.Image):
+        # this is a PIL image
+        buffered = BytesIO()
+        image_path_or_PIL_img.save(buffered, format="JPEG")
+        return base64.b64encode(buffered.getvalue()).decode('utf-8')
+    else:
+        # this is a image_path
+        with open(image_path_or_PIL_img, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')

@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Loader2, Send, Upload, Youtube, ChevronDown, ChevronUp, User, Bot, HelpCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
@@ -42,6 +41,7 @@ export function ChatWithVideo() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const refreshTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const uploadButtonRef = useRef<HTMLButtonElement>(null)
   const { toast } = useToast()
 
   // Add a ref to track initial load
@@ -222,9 +222,10 @@ export function ChatWithVideo() {
 
   return (
     <TooltipProvider>
-      <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
-        {/* Header with Video Selection */}
-        <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+      {/* Main container with relative positioning and fixed height */}
+      <div className="relative h-full bg-gray-50 dark:bg-gray-900">
+        {/* Header - Fixed at top */}
+        <div className="absolute top-0 left-0 right-0 z-10 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
           <div className="p-4 max-w-4xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
@@ -265,200 +266,207 @@ export function ChatWithVideo() {
                   </Select>
                 </div>
 
-                <Button variant="outline" className="gap-2" onClick={() => setIsUploadOpen(!isUploadOpen)}>
-                  <Upload className="h-4 w-4" />
-                  <span className="hidden sm:inline">Upload Video</span>
-                  {isUploadOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
+                <div className="relative">
+                  <Button
+                    ref={uploadButtonRef}
+                    variant="outline"
+                    className="gap-2"
+                    onClick={() => setIsUploadOpen(!isUploadOpen)}
+                  >
+                    <Upload className="h-4 w-4" />
+                    <span className="hidden sm:inline">Upload Video</span>
+                    {isUploadOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </Button>
+
+                  {/* Collapsible Upload Form - Positioned relative to button */}
+                  <Collapsible open={isUploadOpen} onOpenChange={setIsUploadOpen}>
+                    <CollapsibleContent>
+                      <div className="absolute right-0 mt-2 w-[400px] p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 shadow-lg z-50 transform -translate-x-1/2 translate-x-[115px]">
+                        <form onSubmit={handleUploadVideo} className="space-y-4">
+                          <div className="grid grid-cols-1 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="video-url">YouTube URL</Label>
+                              <Input
+                                id="video-url"
+                                value={videoUrl}
+                                onChange={(e) => setVideoUrl(e.target.value)}
+                                placeholder="https://www.youtube.com/watch?v=..."
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Label htmlFor="context-length">Transcript Augmentation (n)</Label>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-6 w-6 p-0">
+                                      <HelpCircle className="h-4 w-4 text-gray-500" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="max-w-xs p-4 space-y-2">
+                                    <ul className="list-disc pl-4 space-y-1 text-sm">
+                                      <li>
+                                        <strong>Transcript Augmentation</strong>: The parameter <code>n</code> defines
+                                        the number of neighboring subtitle segments used to enrich the transcript for
+                                        each video frame.
+                                      </li>
+                                      <li>
+                                        For each frame, the transcript is expanded by including <code>n</code>{" "}
+                                        surrounding segments — typically half before and half after the current frame.
+                                      </li>
+                                      <li>
+                                        This augmentation provides more context and improves the quality of embeddings,
+                                        which directly impacts the performance of search and retrieval tasks.
+                                      </li>
+                                      <li>
+                                        Choosing the right <code>n</code> value is data-dependent. We recommend
+                                        experimenting with different values to ensure the augmented transcripts contain
+                                        one or two meaningful and self-contained ideas.
+                                      </li>
+                                    </ul>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </div>
+                              <Input
+                                id="context-length"
+                                type="number"
+                                value={contextLength}
+                                onChange={(e) => setContextLength(e.target.value)}
+                                placeholder="6"
+                                min="1"
+                                className="w-full"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="no-language"
+                              checked={isNoLanguage}
+                              onCheckedChange={(checked) => setIsNoLanguage(checked === true)}
+                            />
+                            <Label htmlFor="no-language" className="text-sm">
+                              No Language Sound (check for videos without speech)
+                            </Label>
+                          </div>
+
+                          <div className="flex justify-end">
+                            <Button
+                              type="submit"
+                              className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                              disabled={isUploading || !videoUrl.trim()}
+                            >
+                              {isUploading ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Uploading...
+                                </>
+                              ) : (
+                                <>
+                                  <Upload className="mr-2 h-4 w-4" />
+                                  Upload Video
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </form>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
               </div>
             </div>
-
-            {/* Collapsible Upload Form */}
-            <Collapsible open={isUploadOpen} onOpenChange={setIsUploadOpen}>
-              <CollapsibleContent>
-                <div className="mt-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                  <form onSubmit={handleUploadVideo} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-2 md:col-span-2">
-                        <Label htmlFor="video-url">YouTube URL</Label>
-                        <Input
-                          id="video-url"
-                          value={videoUrl}
-                          onChange={(e) => setVideoUrl(e.target.value)}
-                          placeholder="https://www.youtube.com/watch?v=..."
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Label htmlFor="context-length">Context Length (n)</Label>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-6 w-6 p-0">
-                                <HelpCircle className="h-4 w-4 text-gray-500" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-xs p-4 space-y-2">
-                              <p className="font-medium">Transcript Augmentation (n is number of neighboring frames)</p>
-                              <ul className="list-disc pl-4 space-y-1 text-sm">
-                                <li>
-                                  It is advised that we should pick an individual n for each video such that the updated
-                                  transcripts say one or two meaningful facts.
-                                </li>
-                                <li>
-                                  Changing the transcriptions which will be ingested into vector store along with their
-                                  corresponding frames will affect directly the performance.
-                                </li>
-                                <li>
-                                  It is advised that one needs to do diligent to experiment with one's data to get the
-                                  best performance.
-                                </li>
-                              </ul>
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
-                        <Input
-                          id="context-length"
-                          type="number"
-                          value={contextLength}
-                          onChange={(e) => setContextLength(e.target.value)}
-                          placeholder="6"
-                          min="1"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="no-language"
-                        checked={isNoLanguage}
-                        onCheckedChange={(checked) => setIsNoLanguage(checked === true)}
-                      />
-                      <Label htmlFor="no-language" className="text-sm">
-                        No Language Sound (check for videos without speech)
-                      </Label>
-                    </div>
-
-                    <div className="flex justify-end">
-                      <Button
-                        type="submit"
-                        className="bg-emerald-500 hover:bg-emerald-600 text-white"
-                        disabled={isUploading || !videoUrl.trim()}
-                      >
-                        {isUploading ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Uploading...
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="mr-2 h-4 w-4" />
-                            Upload Video
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </form>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
           </div>
         </div>
 
-        {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Chat Messages */}
-          <ScrollArea className="flex-1">
-            <div className="p-4 max-w-3xl mx-auto">
-              <div className="space-y-6">
-                {messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-[50vh] text-center space-y-4">
-                    <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                      <Youtube className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                    <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-                      {videoTitles.length === 0
-                        ? "Upload a video to get started"
-                        : `Ask questions about "${selectedVideo || "the selected video"}"`}
-                    </h3>
-                    <p className="text-gray-500 dark:text-gray-400 max-w-md">
-                      {videoTitles.length === 0
-                        ? "Click 'Upload Video' above to add your first video"
-                        : "The AI will analyze the video and provide answers with relevant frames"}
-                    </p>
+        {/* Scrollable Chat Messages Area - Fixed position with top and bottom offsets */}
+        <div className="absolute top-[88px] bottom-[76px] left-0 right-0 overflow-y-auto">
+          <div className="p-4 max-w-3xl mx-auto">
+            <div className="space-y-6">
+              {messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-[50vh] text-center space-y-4">
+                  <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                    <Youtube className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                ) : (
-                  messages.map((message, i) => (
-                    <div
-                      key={i}
-                      className={cn("flex gap-3", message.role === "user" ? "justify-end" : "justify-start")}
-                    >
-                      {message.role === "assistant" && (
-                        <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 mt-1">
-                          <Bot className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                        </div>
-                      )}
-                      <div
-                        className={cn(
-                          "rounded-2xl px-4 py-3 max-w-[85%] shadow-sm",
-                          message.role === "user"
-                            ? "bg-emerald-500 text-white rounded-tr-none"
-                            : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-tl-none",
-                        )}
-                      >
-                        <p className="whitespace-pre-wrap mb-3 leading-relaxed">{message.content}</p>
-                        {message.image && (
-                          <div className="mt-2 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-                            <img
-                              src={message.image || "/placeholder.svg"}
-                              alt="Video frame"
-                              className="w-full h-auto max-h-[300px] object-contain bg-gray-100 dark:bg-gray-900"
-                            />
-                            <div className="p-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                              <Youtube className="w-4 h-4" />
-                              <span>Frame from {selectedVideo}</span>
-                            </div>
-                          </div>
-                        )}
+                  <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
+                    {videoTitles.length === 0
+                      ? "Upload a video to get started"
+                      : `Ask questions about "${selectedVideo || "the selected video"}"`}
+                  </h3>
+                  <p className="text-gray-500 dark:text-gray-400 max-w-md">
+                    {videoTitles.length === 0
+                      ? "Click 'Upload Video' above to add your first video"
+                      : "The AI will analyze the video and provide answers with relevant frames"}
+                  </p>
+                </div>
+              ) : (
+                messages.map((message, i) => (
+                  <div key={i} className={cn("flex gap-3", message.role === "user" ? "justify-end" : "justify-start")}>
+                    {message.role === "assistant" && (
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 mt-1">
+                        <Bot className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       </div>
-                      {message.role === "user" && (
-                        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-1">
-                          <User className="w-5 h-5 text-white" />
+                    )}
+                    <div
+                      className={cn(
+                        "rounded-2xl px-4 py-3 max-w-[85%] shadow-sm",
+                        message.role === "user"
+                          ? "bg-emerald-500 text-white rounded-tr-none"
+                          : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-tl-none",
+                      )}
+                    >
+                      <p className="whitespace-pre-wrap mb-3 leading-relaxed">{message.content}</p>
+                      {message.image && (
+                        <div className="mt-2 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                          <img
+                            src={message.image || "/placeholder.svg"}
+                            alt="Video frame"
+                            className="w-full h-auto max-h-[300px] object-contain bg-gray-100 dark:bg-gray-900"
+                          />
+                          <div className="p-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                            <Youtube className="w-4 h-4" />
+                            <span>Frame from {selectedVideo}</span>
+                          </div>
                         </div>
                       )}
                     </div>
-                  ))
-                )}
-                <div ref={messagesEndRef} />
-              </div>
+                    {message.role === "user" && (
+                      <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-1">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+              <div ref={messagesEndRef} />
             </div>
-          </ScrollArea>
-
-          {/* Chat Input */}
-          <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-            <form onSubmit={handleAskQuestion} className="flex gap-2 max-w-3xl mx-auto">
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={
-                  !selectedVideo
-                    ? "Select a video first..."
-                    : videoTitles.length === 0
-                      ? "Upload a video to start chatting..."
-                      : `Ask about "${selectedVideo}"...`
-                }
-                className="flex-1"
-                disabled={isQuerying || !selectedVideo || videoTitles.length === 0}
-              />
-              <Button
-                type="submit"
-                className="bg-emerald-500 hover:bg-emerald-600 text-white"
-                disabled={isQuerying || !query.trim() || !selectedVideo || videoTitles.length === 0}
-              >
-                {isQuerying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              </Button>
-            </form>
           </div>
+        </div>
+
+        {/* Fixed Footer */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+          <form onSubmit={handleAskQuestion} className="flex gap-2 max-w-3xl mx-auto">
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={
+                !selectedVideo
+                  ? "Select a video first..."
+                  : videoTitles.length === 0
+                    ? "Upload a video to start chatting..."
+                    : `Ask about "${selectedVideo}"...`
+              }
+              className="flex-1"
+              disabled={isQuerying || !selectedVideo || videoTitles.length === 0}
+            />
+            <Button
+              type="submit"
+              className="bg-emerald-500 hover:bg-emerald-600 text-white"
+              disabled={isQuerying || !query.trim() || !selectedVideo || videoTitles.length === 0}
+            >
+              {isQuerying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            </Button>
+          </form>
         </div>
       </div>
     </TooltipProvider>

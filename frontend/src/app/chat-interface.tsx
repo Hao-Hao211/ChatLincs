@@ -713,7 +713,6 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Send,
@@ -730,14 +729,13 @@ import {
   MoreVertical,
   Trash,
   Edit,
+  Check,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 // 需要先安装 uuid： npm install uuid
 import { v4 as uuidv4 } from "uuid"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 
 export type ChatMessage = {
@@ -767,6 +765,12 @@ type Conversation = {
   messages: ChatMessage[]
 }
 
+// Storage keys
+const STORAGE_KEYS = {
+  CONVERSATIONS: "chatlincs-conversations",
+  ACTIVE_SESSION: "chatlincs-active-session",
+}
+
 export function ChatInterface() {
   // -------------------- 状态管理 --------------------
   // 当前对话及历史会话
@@ -786,22 +790,83 @@ export function ChatInterface() {
   const [retrieve, setRetrieve] = useState<boolean>(false)
   // 上传文件，仅支持单文件（可自行扩展）
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
-  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
-  const [newTitle, setNewTitle] = useState("")
   // Add this after the other state declarations
   const [collectionError, setCollectionError] = useState(false)
+  // Initialization flag
+  const [isInitialized, setIsInitialized] = useState(false)
+
+  // Inline editing state
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null)
+  const [editingTitle, setEditingTitle] = useState("")
 
   // 引用
   const fileInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const editInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
   // -------------------- 初始化逻辑 --------------------
   useEffect(() => {
-    createNewConversation()
+    // Load conversations from localStorage
+    const loadSavedData = () => {
+      try {
+        // Load conversations
+        const savedConversations = localStorage.getItem(STORAGE_KEYS.CONVERSATIONS)
+        const parsedConversations = savedConversations ? JSON.parse(savedConversations) : []
+
+        // Load active session
+        const savedActiveSession = localStorage.getItem(STORAGE_KEYS.ACTIVE_SESSION)
+
+        if (parsedConversations.length > 0) {
+          setConversations(parsedConversations)
+
+          // Set active session
+          const sessionToActivate = savedActiveSession || parsedConversations[0].sessionId
+          setActiveSessionId(sessionToActivate)
+
+          // Set messages for active session
+          const activeConversation = parsedConversations.find(
+            (conv: Conversation) => conv.sessionId === sessionToActivate,
+          )
+          if (activeConversation) {
+            setMessages(activeConversation.messages)
+          }
+        } else {
+          // If no conversations, create a new one
+          createNewConversation()
+        }
+      } catch (error) {
+        console.error("Error loading saved conversations:", error)
+        createNewConversation()
+      }
+
+      setIsInitialized(true)
+    }
+
+    loadSavedData()
     fetchCollections()
   }, [])
+
+  // Save conversations to localStorage whenever they change
+  useEffect(() => {
+    if (isInitialized && conversations.length > 0) {
+      localStorage.setItem(STORAGE_KEYS.CONVERSATIONS, JSON.stringify(conversations))
+    }
+  }, [conversations, isInitialized])
+
+  // Save active session to localStorage whenever it changes
+  useEffect(() => {
+    if (isInitialized && activeSessionId) {
+      localStorage.setItem(STORAGE_KEYS.ACTIVE_SESSION, activeSessionId)
+    }
+  }, [activeSessionId, isInitialized])
+
+  // Focus edit input when editing starts
+  useEffect(() => {
+    if (editingSessionId && editInputRef.current) {
+      editInputRef.current.focus()
+    }
+  }, [editingSessionId])
 
   // 新建对话
   const createNewConversation = () => {
@@ -891,14 +956,12 @@ export function ChatInterface() {
   // -------------------- 发送消息 --------------------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // 若输入为空且没有上传文件，或者正在加载，就不发送
-    if ((!input.trim() && uploadedFiles.length === 0) || isLoading) return
+    // 若输入为空或者正在加载，就不发送
+    if (!input.trim() || isLoading) return
 
     // 验证：如果勾选了retrieve但没有选择collection，显示错误提示
     if (retrieve && (!collectionName || collectionName === "")) {
       setCollectionError(true)
-      // 滚动到顶部让用户看到错误提示
-      window.scrollTo({ top: 0, behavior: "smooth" })
       return
     }
 
@@ -1042,24 +1105,40 @@ export function ChatInterface() {
     }
   }
 
-  // Open rename dialog
-  const openRenameDialog = (conversation: Conversation) => {
-    setSelectedConversation(conversation)
-    setNewTitle(conversation.title)
-    setIsRenameDialogOpen(true)
+  // Start editing a conversation title
+  const startEditing = (sessionId: string, currentTitle: string) => {
+    setEditingSessionId(sessionId)
+    setEditingTitle(currentTitle)
   }
 
-  // Rename a conversation
-  const renameConversation = () => {
-    if (!selectedConversation || !newTitle.trim()) return
+  // Save the edited title
+  const saveEditedTitle = () => {
+    if (!editingSessionId || !editingTitle.trim()) {
+      setEditingSessionId(null)
+      return
+    }
 
-    setConversations((prev) =>
-      prev.map((conv) =>
-        conv.sessionId === selectedConversation.sessionId ? { ...conv, title: newTitle.trim() } : conv,
-      ),
+    // Create a new conversations array with the updated title
+    const updatedConversations = conversations.map((conv) =>
+      conv.sessionId === editingSessionId ? { ...conv, title: editingTitle.trim() } : conv,
     )
 
-    setIsRenameDialogOpen(false)
+    // Update the state with the new array
+    setConversations(updatedConversations)
+
+    // Reset editing state
+    setEditingSessionId(null)
+    setEditingTitle("")
+  }
+
+  // Handle key press in the edit input
+  const handleEditKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      saveEditedTitle()
+    } else if (e.key === "Escape") {
+      setEditingSessionId(null)
+      setEditingTitle("")
+    }
   }
 
   // -------------------- 渲染 --------------------
@@ -1088,35 +1167,53 @@ export function ChatInterface() {
                       : "hover:bg-gray-100 dark:hover:bg-gray-700",
                   )}
                 >
-                  <div
-                    className="flex-1 truncate"
-                    onClick={() => {
-                      setActiveSessionId(conv.sessionId)
-                      setMessages(conv.messages)
-                    }}
-                  >
-                    {conv.title}
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100">
-                        <MoreVertical className="h-4 w-4" />
+                  {editingSessionId === conv.sessionId ? (
+                    <div className="flex-1 flex items-center gap-2">
+                      <Input
+                        ref={editInputRef}
+                        value={editingTitle}
+                        onChange={(e) => setEditingTitle(e.target.value)}
+                        onKeyDown={handleEditKeyPress}
+                        className="flex-1 h-7 py-1"
+                        autoFocus
+                      />
+                      <Button variant="ghost" size="icon" className="h-7 w-7 p-0" onClick={saveEditedTitle}>
+                        <Check className="h-4 w-4" />
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => openRenameDialog(conv)}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Rename
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-red-500 focus:text-red-500"
-                        onClick={() => deleteConversation(conv.sessionId)}
+                    </div>
+                  ) : (
+                    <>
+                      <div
+                        className="flex-1 truncate"
+                        onClick={() => {
+                          setActiveSessionId(conv.sessionId)
+                          setMessages(conv.messages)
+                        }}
                       >
-                        <Trash className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        {conv.title}
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => startEditing(conv.sessionId, conv.title)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Rename
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-500 focus:text-red-500"
+                            onClick={() => deleteConversation(conv.sessionId)}
+                          >
+                            <Trash className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>
@@ -1124,12 +1221,17 @@ export function ChatInterface() {
         </div>
       </aside>
 
-      {/* 右侧聊天区域 */}
-      <div className="flex flex-col flex-1">
-        {/* Header */}
-        <div className="flex-none border-b bg-white dark:bg-gray-800 shadow-sm">
+      {/* 右侧聊天区域 - 使用固定布局 */}
+      <div className="flex-1 relative h-full overflow-hidden">
+        {/* Header - Fixed at top */}
+        <div className="absolute top-0 left-0 right-0 z-10 border-b bg-white dark:bg-gray-800 shadow-sm">
           <div className="p-4 max-w-4xl mx-auto flex items-center justify-between">
-            <h2 className="text-lg font-medium text-gray-800 dark:text-gray-200">AI Assistant</h2>
+            <div>
+              <h2 className="font-semibold text-lg text-gray-800 dark:text-white">Multimodal RAG</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Ask questions and retrieve insights from image, text, and audio
+            </p>
+            </div>
             <Select
               value={collectionName}
               onValueChange={setCollectionName}
@@ -1176,177 +1278,168 @@ export function ChatInterface() {
           </div>
         </div>
 
-        {/* Scrollable Chat Area */}
-        <div className="flex-1 overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
-          <ScrollArea className="h-full">
-            <div className="p-4 max-w-4xl mx-auto">
-              <div className="space-y-6">
-                {/* 如果当前没有消息，则显示占位界面 */}
-                {messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-[50vh] text-center space-y-4">
-                    <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                      <Bot className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                    <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">How can I help you today?</h3>
-                    <p className="text-gray-500 dark:text-gray-400 max-w-md">
-                      Ask me anything or upload files for analysis.
-                    </p>
+        {/* Scrollable Chat Area - Fixed position with top and bottom offsets */}
+        <div className="absolute top-[64px] bottom-[140px] left-0 right-0 overflow-auto bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
+          <div className="p-4 max-w-4xl mx-auto">
+            <div className="space-y-6">
+              {/* 如果当前没有消息，则显示占位界面 */}
+              {messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-[50vh] text-center space-y-4">
+                  <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                    <Bot className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                ) : (
-                  /* 显示对话消息 */
-                  messages.map((message, i) => (
+                  <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">How can I help you today?</h3>
+                  <p className="text-gray-500 dark:text-gray-400 max-w-md">
+                    Ask me anything or upload files for analysis.
+                  </p>
+                </div>
+              ) : (
+                /* 显示对话消息 */
+                messages.map((message, i) => (
+                  <div key={i} className={cn("flex gap-3", message.role === "user" ? "justify-end" : "justify-start")}>
+                    {message.role === "assistant" && (
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 mt-1">
+                        <Bot className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                    )}
                     <div
-                      key={i}
-                      className={cn("flex gap-3", message.role === "user" ? "justify-end" : "justify-start")}
-                    >
-                      {message.role === "assistant" && (
-                        <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 mt-1">
-                          <Bot className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                        </div>
+                      className={cn(
+                        "rounded-2xl px-4 py-3 max-w-[85%] shadow-sm",
+                        message.role === "user"
+                          ? "bg-emerald-500 text-white rounded-tr-none"
+                          : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-tl-none",
                       )}
-                      <div
-                        className={cn(
-                          "rounded-2xl px-4 py-3 max-w-[85%] shadow-sm",
-                          message.role === "user"
-                            ? "bg-emerald-500 text-white rounded-tr-none"
-                            : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-tl-none",
-                        )}
-                      >
-                        {/* 文本内容 */}
-                        {message.content && (
-                          <p className="whitespace-pre-wrap mb-3 leading-relaxed">{message.content}</p>
-                        )}
+                    >
+                      {/* 文本内容 */}
+                      {message.content && <p className="whitespace-pre-wrap mb-3 leading-relaxed">{message.content}</p>}
 
-                        {/* 用户上传文件（仅用户消息会有 files） */}
-                        {message.files && message.files.length > 0 && (
-                          <div className="space-y-3">
-                            {message.files.map((file, fileIndex) => (
-                              <div
-                                key={fileIndex}
-                                className="rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md"
-                              >
-                                {file.type.startsWith("image/") && file.previewUrl ? (
-                                  <div className="space-y-2">
-                                    <div className="rounded-lg overflow-hidden border border-white/20 dark:border-gray-700">
-                                      <img
-                                        src={file.previewUrl || "/placeholder.svg"}
-                                        alt={file.name}
-                                        className="w-full h-auto rounded-lg max-h-[300px] object-contain bg-gray-100 dark:bg-gray-900"
-                                      />
-                                    </div>
-                                    <div
+                      {/* 用户上传文件（仅用户消息会有 files） */}
+                      {message.files && message.files.length > 0 && (
+                        <div className="space-y-3">
+                          {message.files.map((file, fileIndex) => (
+                            <div
+                              key={fileIndex}
+                              className="rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md"
+                            >
+                              {file.type.startsWith("image/") && file.previewUrl ? (
+                                <div className="space-y-2">
+                                  <div className="rounded-lg overflow-hidden border border-white/20 dark:border-gray-700">
+                                    <img
+                                      src={file.previewUrl || "/placeholder.svg"}
+                                      alt={file.name}
+                                      className="w-full h-auto rounded-lg max-h-[300px] object-contain bg-gray-100 dark:bg-gray-900"
+                                    />
+                                  </div>
+                                  <div
+                                    className={cn(
+                                      "flex items-center gap-2 text-xs",
+                                      message.role === "user" ? "text-white/80" : "text-gray-500 dark:text-gray-400",
+                                    )}
+                                  >
+                                    {getFileIcon(file.type)}
+                                    <span>{file.name}</span>
+                                    <span>({formatFileSize(file.size)})</span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div
+                                  className={cn(
+                                    "flex items-center gap-3 p-3 rounded-lg",
+                                    message.role === "user" ? "bg-emerald-600/40" : "bg-gray-100 dark:bg-gray-700/50",
+                                  )}
+                                >
+                                  <div
+                                    className={cn(
+                                      "p-3 rounded-lg",
+                                      message.role === "user" ? "bg-emerald-700/40" : "bg-white dark:bg-gray-800",
+                                    )}
+                                  >
+                                    {getFileIcon(file.type)}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium truncate">{file.name}</p>
+                                    <p
                                       className={cn(
-                                        "flex items-center gap-2 text-xs",
-                                        message.role === "user" ? "text-white/80" : "text-gray-500 dark:text-gray-400",
+                                        "text-xs",
+                                        message.role === "user" ? "text-white/70" : "text-gray-500 dark:text-gray-400",
                                       )}
                                     >
-                                      {getFileIcon(file.type)}
-                                      <span>{file.name}</span>
-                                      <span>({formatFileSize(file.size)})</span>
+                                      {formatFileSize(file.size)} • {file.type.split("/")[1].toUpperCase()}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* 后端返回的媒体内容（assistant 消息中可能带有 images / audios） */}
+                      {message.media && message.media.length > 0 && (
+                        <div className="mt-3 space-y-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700"></div>
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                              Retrieved Content
+                            </span>
+                            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700"></div>
+                          </div>
+                          <div className="grid gap-4 grid-cols-1">
+                            {message.media.map((item, mediaIndex) => (
+                              <div
+                                key={mediaIndex}
+                                className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm transition-all duration-200 hover:shadow-md"
+                              >
+                                {item.type === "image" ? (
+                                  <div className="space-y-2">
+                                    <img
+                                      src={item.url || "/placeholder.svg"}
+                                      alt={`Retrieved image ${mediaIndex + 1}`}
+                                      className="w-full h-auto max-h-[300px] object-contain bg-gray-100 dark:bg-gray-900"
+                                    />
+                                    <div className="p-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                      <Image className="w-4 h-4" />
+                                      <span>Image {mediaIndex + 1}</span>
                                     </div>
                                   </div>
                                 ) : (
-                                  <div
-                                    className={cn(
-                                      "flex items-center gap-3 p-3 rounded-lg",
-                                      message.role === "user" ? "bg-emerald-600/40" : "bg-gray-100 dark:bg-gray-700/50",
+                                  <div className="p-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <Music className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                      <span className="text-sm font-medium">Audio {mediaIndex + 1}</span>
+                                    </div>
+                                    <audio controls className="w-full">
+                                      <source src={item.url} type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                    {item.transcript && (
+                                      <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                                        <strong>Transcript:</strong> {item.transcript}
+                                      </div>
                                     )}
-                                  >
-                                    <div
-                                      className={cn(
-                                        "p-3 rounded-lg",
-                                        message.role === "user" ? "bg-emerald-700/40" : "bg-white dark:bg-gray-800",
-                                      )}
-                                    >
-                                      {getFileIcon(file.type)}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="font-medium truncate">{file.name}</p>
-                                      <p
-                                        className={cn(
-                                          "text-xs",
-                                          message.role === "user"
-                                            ? "text-white/70"
-                                            : "text-gray-500 dark:text-gray-400",
-                                        )}
-                                      >
-                                        {formatFileSize(file.size)} • {file.type.split("/")[1].toUpperCase()}
-                                      </p>
-                                    </div>
                                   </div>
                                 )}
                               </div>
                             ))}
                           </div>
-                        )}
-
-                        {/* 后端返回的媒体内容（assistant 消息中可能带有 images / audios） */}
-                        {message.media && message.media.length > 0 && (
-                          <div className="mt-3 space-y-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700"></div>
-                              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                                Retrieved Content
-                              </span>
-                              <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                            <div className="grid gap-4 grid-cols-1">
-                              {message.media.map((item, mediaIndex) => (
-                                <div
-                                  key={mediaIndex}
-                                  className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm transition-all duration-200 hover:shadow-md"
-                                >
-                                  {item.type === "image" ? (
-                                    <div className="space-y-2">
-                                      <img
-                                        src={item.url || "/placeholder.svg"}
-                                        alt={`Retrieved image ${mediaIndex + 1}`}
-                                        className="w-full h-auto max-h-[300px] object-contain bg-gray-100 dark:bg-gray-900"
-                                      />
-                                      <div className="p-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                                        <Image className="w-4 h-4" />
-                                        <span>Image {mediaIndex + 1}</span>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className="p-3">
-                                      <div className="flex items-center gap-2 mb-2">
-                                        <Music className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                        <span className="text-sm font-medium">Audio {mediaIndex + 1}</span>
-                                      </div>
-                                      <audio controls className="w-full">
-                                        <source src={item.url} type="audio/wav" />
-                                        Your browser does not support the audio element.
-                                      </audio>
-                                      {item.transcript && (
-                                        <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                                          <strong>Transcript:</strong> {item.transcript}
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      {message.role === "user" && (
-                        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-1">
-                          <User className="w-5 h-5 text-white" />
                         </div>
                       )}
                     </div>
-                  ))
-                )}
-                <div ref={messagesEndRef} />
-              </div>
+                    {message.role === "user" && (
+                      <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-1">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+              <div ref={messagesEndRef} />
             </div>
-          </ScrollArea>
+          </div>
         </div>
 
-        {/* 底部输入区 */}
-        <div className="flex-none border-t bg-white dark:bg-gray-800">
+        {/* 底部输入区 - Fixed at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 border-t bg-white dark:bg-gray-800">
           <div className="p-4 max-w-4xl mx-auto">
             {/* 上传文件预览 */}
             {uploadedFiles.length > 0 && (
@@ -1418,7 +1511,7 @@ export function ChatInterface() {
               </div>
               <Button
                 type="submit"
-                disabled={isLoading || (!input.trim() && uploadedFiles.length === 0)}
+                disabled={isLoading || !input.trim()}
                 className="flex-none bg-emerald-500 hover:bg-emerald-600 text-white"
               >
                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
@@ -1427,37 +1520,17 @@ export function ChatInterface() {
           </div>
         </div>
       </div>
-      {/* Rename Dialog */}
-      <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Rename Conversation</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input
-                id="name"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                className="col-span-3"
-                autoFocus
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button onClick={renameConversation} disabled={!newTitle.trim()}>
-              Save
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
+
+
+
+
+
+
+
+
+
+
 

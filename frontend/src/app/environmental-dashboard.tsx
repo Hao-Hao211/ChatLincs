@@ -27,15 +27,15 @@ type Task = {
 }
 
 const initialTasks: Task[] = [
-  {
+    {
     id: "1",
-    title: "Organize beach cleanup",
-    description: "Plan and execute a beach cleanup event",
+    title: "Lost dog in Regent's Park",
+    description: "A white Samoyed is lost. Please help us find him.",
     status: "todo",
     priority: "high",
-    dueDate: "2023-08-15",
-    assignee: "John Doe",
-    category: "Pollution Control",
+    dueDate: "2024-02-11",
+    assignee: "Hao Zhang",
+    category: "Animal Rescue",
     isCompleted: false,
   },
   {
@@ -59,6 +59,17 @@ const initialTasks: Task[] = [
     assignee: "Alex Johnson",
     category: "Wildlife Conservation",
     isCompleted: true,
+  },
+  {
+    id: "4",
+    title: "Organize beach cleanup",
+    description: "Plan and execute a beach cleanup event",
+    status: "todo",
+    priority: "low",
+    dueDate: "2023-08-15",
+    assignee: "John Doe",
+    category: "Pollution Control",
+    isCompleted: false,
   },
 ]
 
@@ -263,7 +274,7 @@ export function EnvironmentalDashboard() {
           </Dialog>
         </div>
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="grid grid-cols-3 gap-6 h-[calc(100vh-150px)]">
+          <div className="grid grid-cols-3 gap-6 h-auto max-h-[600px]">
             {["todo", "inProgress", "done"].map((status) => (
               <Droppable key={status} droppableId={status}>
                 {(provided, snapshot) => (
@@ -277,7 +288,7 @@ export function EnvironmentalDashboard() {
                     <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 capitalize">
                       {status.replace(/([A-Z])/g, " $1").trim()}
                     </h3>
-                    <ScrollArea className="h-[calc(100vh-250px)]">
+                    <ScrollArea className="h-[600px]">
                       {tasks
                         .filter((task) => task.status === status)
                         .map((task, index) => (
@@ -287,13 +298,13 @@ export function EnvironmentalDashboard() {
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
-                                className={`mb-3 ${
+                                className={`mb-2 ${
                                   snapshot.isDragging
                                     ? "shadow-lg ring-2 ring-blue-400"
                                     : "hover:shadow-md transition-shadow duration-200"
                                 }`}
                               >
-                                <CardHeader className="p-4">
+                                <CardHeader className="p-3 pb-0">
                                   <CardTitle className="flex justify-between items-center text-lg font-semibold">
                                     <span className={task.isCompleted ? "line-through text-gray-500" : ""}>
                                       {task.title}
@@ -312,7 +323,7 @@ export function EnvironmentalDashboard() {
                                     </div>
                                   </CardTitle>
                                 </CardHeader>
-                                <CardContent className="p-4 pt-0">
+                                <CardContent className="p-3 pt-0">
                                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{task.description}</p>
                                   <div className="flex flex-wrap items-center gap-2">
                                     <span
