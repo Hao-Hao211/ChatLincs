@@ -310,7 +310,6 @@ def new_geo_search():
         return jsonify({"error": results["error"]}), 400
 
     return jsonify({"results": results["results"]}), 200
-'''
 
 @api_bp.route('/geo_map', methods=['GET'])
 def geo_map():
