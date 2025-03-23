@@ -61,11 +61,3 @@ def new_search_nearby(collection_name, keyword=None, latitude=None, longitude=No
 
     conn.close()
     return {"results": results}
-
-if __name__ == "__main__":
-    collection_name = "animal_test"
-    new_initialize_database(collection_name)
-    print(f"DataBase {collection_name} has been initialized.")
-
-    result = new_search_nearby(collection_name, keyword="", address="The Regent's Park", radius_km=2)
-    print("Result：", result)

@@ -1,3 +1,5 @@
+'''
+
 import base64
 
 
@@ -6,6 +8,8 @@ def toBase64(path):
     with open(path, 'rb') as file:
         return base64.b64encode(file.read()).decode('utf-8')
 
+'''
+
 # Helper functions to display results
 import json
 from IPython.display import Image, Audio, Video
@@ -13,6 +17,7 @@ from IPython.display import Image, Audio, Video
 def json_print(data):
     print(json.dumps(data, indent=2))
 
+'''
 
 import base64, requests
 
@@ -30,3 +35,4 @@ def file_to_base64(path):
 # Update the url and path to test
 #test_image_base64 = url_to_base64("https://path-to-some-online-image.jpg")
 #test_file_base64 = file_to_base64("./test/meerkat.jpeg")
+'''

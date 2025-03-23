@@ -114,10 +114,3 @@ def insert_file(file, collection_name, description, address=None, latitude=None,
     add_media_to_database(collection_name, saved_path, description, address, latitude, longitude)
     print(f"File '{file_path}' successfully stored into '{collection_name}.db'")
     client.close()
-
-if __name__ == '__main__':
-    file_path = "../test/test-cat.jpg"
-    collection_name = "animal_test"
-    description = "A cute dog picture"
-    address = "The Regent's Park, London"
-    insert_file(file_path, collection_name, description, address=address)

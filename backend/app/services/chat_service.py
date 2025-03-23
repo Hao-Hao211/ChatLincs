@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv, find_dotenv
 import weaviate
 
-from app.utils.helpers import url_to_base64, json_print
+from app.utils.helpers import json_print
 
 # client = weaviate.connect_to_local()
 
@@ -326,8 +326,3 @@ def generate_response_multimodal_ollama(query, files, chat_history):
     )
     return response.message['content']
 
-
-if __name__ == "__main__":
-    query = "Do you remember what animal is on the log"
-    retrieved_files = retrieve_media(query,"Demo_v1")
-    response = generate_response_multimodal_ollama(query, retrieved_files)
