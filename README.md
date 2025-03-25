@@ -14,21 +14,21 @@
 
 ## 📖 Table of Contents
 
-1. [Features](#features)
-2. [Project Overview](#project-overview)
+1. [Features](#-features)
+2. [Project Overview](#-project-overview)
    - [Backend Architecture](#backend-architecture)
    - [Backend Architecture Diagram](#backend-architecture-diagram)
    - [Frontend Overview](#frontend-overview)
-3. [Technology Stack](#technology-stack)
-4. [Setup Instructions](#setup-instructions)
-   - [Prerequisites](#prerequisites)
-   - [Backend Setup](#backend-setup)
-   - [Frontend Setup](#frontend-setup)
-5. [How to Run](#how-to-run)
-6. [Docker Deployment](#docker-deployment)
-7. [User Manual](#user-manual)
-8. [Troubleshooting & FAQs](#troubleshooting--faqs)
-9. [Contributors](#contributors)
+3. [Technology Stack](#-technology-stack)
+4. [Setup Instructions](#-setup-instructions)
+   - [Prerequisites](#-prerequisites)
+   - [Backend Setup](#-backend-setup)
+   - [Frontend Setup](#-frontend-setup)
+5. [How to Run](#-how-to-run)
+6. [Docker Deployment](#-docker-deployment)
+7. [User Manual](#-user-manual)
+8. [Troubleshooting & FAQs](#-troubleshooting--faqs)
+9. [Contributors](#-contributors)
 
 ## 🌟 Features 
 
@@ -71,7 +71,7 @@ The frontend delivers a user-friendly experience through:
 **Frontend Interface**:  
 ![Frontend Interface](./assets/interface.png)
 
-## 🛠️ Technology Stack
+## 🛠 Technology Stack
 
 ### Frontend
 
@@ -93,7 +93,7 @@ The frontend delivers a user-friendly experience through:
 
 ---
 
-## ⚙️ Setup Instructions
+## 🛠 Setup Instructions
 
 ### 📌 Prerequisites
 
@@ -216,7 +216,7 @@ services:
 
 ---
 
-## 🛠️ User Manual
+## 💻 User Manual
 
 ### 1. 📁 **Upload Data**
 
@@ -371,7 +371,7 @@ The chatbot identifies the astronaut as **Robert Behnken** and provides a releva
 
 ---
 
-## 🛎️ Troubleshooting & FAQs
+## 🛠 Troubleshooting & FAQs
 
 - **Slow Upload/Processing:** Choose *shorter videos with transcripts.*
 - **Location issues:** Use *precise addresses* or coordinates.
