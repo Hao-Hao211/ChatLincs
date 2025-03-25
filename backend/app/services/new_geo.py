@@ -29,7 +29,7 @@ def new_search_nearby(collection_name, keyword=None, latitude=None, longitude=No
     if not os.path.exists(db_path):
         return {"error": f"Collection '{collection_name}' does not exist."}
 
-    geolocator = Nominatim(user_agent="ChatLincs/1.0 (haozhang2004@gmail.com)")
+    geolocator = Nominatim(user_agent="ChatLincs")
     if address:
         location = geolocator.geocode(address)
         if location:
