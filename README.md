@@ -266,7 +266,7 @@ We search within 3.6 km around "King’s Cross" station in the "Demo" collection
 
 - Result: Dog image at "University College London", 1.14 km away.
 
-  ![map](https://p.ipic.vip/e9errg.png)
+  ![map](./assets/map.png)
 
 ---
 
