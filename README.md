@@ -119,7 +119,7 @@ Launch Docker services:
 
 ```bash
 cd backend/app
-docker compose up -d
+docker compose up
 ```
 
 ### 🌐 Frontend Setup
