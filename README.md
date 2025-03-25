@@ -111,7 +111,7 @@ Clone repository and set up environment:
 ```bash
 git clone https://github.com/Hao-Hao211/ChatLincs.git
 cd ChatLincs
-conda env create -f chatlincs.yml
+conda env create --platform osx-arm64 -f chatlincs.yml
 conda activate chatlincs
 ```
 
@@ -140,7 +140,7 @@ npm install --legacy-peer-deps
 Run Flask server:
 
 ```bash
-cd backend
+cd ChatLincs/backend
 python run.py
 ```
 
@@ -151,7 +151,7 @@ Backend API at: [http://localhost:5000](http://localhost:5000)
 Launch frontend server:
 
 ```bash
-cd frontend
+cd ChatLincs/frontend
 npm run dev
 ```
 
