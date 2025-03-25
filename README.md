@@ -8,7 +8,7 @@
 
 **ChatLincs** is an advanced multimodal Retrieval-Augmented Generation (RAG) platform designed to facilitate comprehensive environmental monitoring and enhance local community engagement. Integrating state-of-the-art AI technologies, ChatLincs empowers users to interact seamlessly with multimodal data (images, audio, text, videos), efficiently manage tasks, and visualize geospatial information.
 
-![logo](https://p.ipic.vip/7amkpi.png)
+![logo](./assets/logo.jpg)
 
 ---
 
@@ -239,9 +239,9 @@ We upload an image titled "A lovely dog with sunglasses," locate it at "Universi
 
 - Collection: "Demo".
 
-  ![upload1](https://p.ipic.vip/uqy78x.png)
+![upload1](./assets/upload1.png)
 
-  ![upload2](https://p.ipic.vip/igr4pq.png)
+![upload2](./assets/upload2.png)
 
   *(Uploaded files from different sources can be stored in the same collection to enrich your dataset.)*
 
@@ -266,7 +266,7 @@ We search within 3.6 km around "King’s Cross" station in the "Demo" collection
 
 - Result: Dog image at "University College London", 1.14 km away.
 
-  ![map](./assets/map.png)
+![map](./assets/map.png)
 
 ---
 
@@ -294,17 +294,17 @@ Efficiently organize and prioritize your tasks:
 
 We create a task titled "Lost dog in Regent's Park" with the description "A white dog with a smile is lost."
 
-![dashboard2](https://p.ipic.vip/m449kz.png)
+![dashboard2](./assets/dashboard2.png)
 
 - Task: "Lost dog in Regent's Park".  
 
 - Description: "A white dog with smile is lost".
 
-  ![dashboard](https://p.ipic.vip/riqb0k.png)
+![dashboard](./assets/dashboard.png)
 
 ---
 
-### 4. 💬 **Multimodal RAG **
+### 4. 💬 Multimodal RAG 
 
 Engage in advanced retrieval-augmented conversations:
 
@@ -320,7 +320,7 @@ To locate our previously uploaded dog image, we type:
 
 The chatbot accurately retrieves the relevant image and provides a detailed description, such as noting that the sunglasses are "*pink and heart-shaped.*"
 
-![chat3](https://p.ipic.vip/tinskv.png)
+![chat3](./assets/chat3.png)
 
 **Example (Multimodal Retrieval):**  
 You can also upload multimedia files directly into the chat:
@@ -334,9 +334,9 @@ We upload an image of a white puppy and ask:
 
 The chatbot successfully retrieves a visually similar dog from the database and provides relevant details.
 
-![chat1](https://p.ipic.vip/7ng0lc.png)
+![chat1](./assets/chat1.png)
 
-![chat2](https://p.ipic.vip/2ly7dw.png)
+![chat2](./assets/chat2.png)
 
 ---
 
@@ -353,13 +353,13 @@ The chatbot successfully retrieves a visually similar dog from the database and 
   - For videos **without spoken language** (e.g., nature videos), check the **"No Language Sound"** box.
   - Click to upload. This **may take several minutes** depending on video length and your hardware performance, as it involves processing video frames, generating embeddings, storing data in a vector database, and performing image recognition.
 
-![video_upload](https://p.ipic.vip/g2khv2.png)
+![video_upload](./assets/video_upload.png)
 
 **Example:**  
 
 We upload the YouTube video ["Welcome back to Planet Earth"](https://www.youtube.com/watch?v=7Hcg-rLYwdM), documenting NASA astronauts Douglas Hurley and Robert Behnken’s return aboard SpaceX’s Crew Dragon Endeavour.
 
-![video_select2](https://p.ipic.vip/ebvos9.png)
+![video_select2](./assets/video_select2.png)
 
 While viewing, we forget one astronaut's name. In the chat box, after selecting this video from the top-right dropdown, we ask:
 
@@ -367,7 +367,7 @@ While viewing, we forget one astronaut's name. In the chat box, after selecting 
 
 The chatbot identifies the astronaut as **Robert Behnken** and provides a relevant video snippet confirming this information.
 
-![video_example](https://p.ipic.vip/952ccd.png)
+![video_example](./assets/video_example.png)
 
 ---
 
