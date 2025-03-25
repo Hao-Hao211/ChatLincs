@@ -122,6 +122,17 @@ cd backend/app
 docker compose up
 ```
 
+>  **Note**: The `ollama` service will attempt to automatically download the `llava:7b` model on first launch.
+>
+> If the download fails (e.g. due to network restrictions), you can **manually pull the model** on your host machine:
+>
+> ```bash
+> ollama pull llava:7b
+> ```
+>
+> Then ensure the model is saved under the mounted volume path (e.g. `./ollama-models`) so it can be used inside the container.
+
+
 ### 🌐 Frontend Setup
 
 Install dependencies:
