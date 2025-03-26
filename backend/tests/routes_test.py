@@ -342,3 +342,84 @@ def test_transcribe_audio_exception(mock_load_model):
     assert "Transcription error" in str(excinfo.value)
     mock_load_model.assert_called_once_with("small")
     mock_model.transcribe.assert_called_once()
+
+'''
+# upload_video() : POST /upload_video
+
+
+@patch('app.routes.video_service.download_video')
+@patch('app.routes.video_service.get_transcript_vtt')
+@patch('app.routes.extract_and_save_frames_and_metadata_with_fps')
+def test_upload_video_without_language_sound(mock_extract_frames, mock_get_transcript, mock_download_video, client):
+    mock_download_video.return_value = './shared_data/videos/test_video.mp4'
+    mock_get_transcript.return_value = None
+    mock_extract_frames.return_value = []
+
+    data = {
+        'video_url': 'https://example.com/test_video',
+        'video_without_language_sound': 'true'
+    }
+    response = client.post('/upload_video', data=data)
+
+    assert response.status_code == 200
+    assert b"success" in response.data
+    mock_download_video.assert_called_once_with('https://example.com/test_video', './shared_data/videos/test_video')
+    mock_extract_frames.assert_called_once()
+
+@patch('app.routes.video_service.download_video')
+@patch('app.routes.video_service.get_transcript_vtt')
+@patch('app.routes.extract_and_save_frames_and_metadata')
+def test_upload_video_with_transcript(mock_extract_frames, mock_get_transcript, mock_download_video, client):
+    mock_download_video.return_value = './shared_data/videos/test_video.mp4'
+    mock_get_transcript.return_value = './shared_data/videos/test_video_transcript.vtt'
+    mock_extract_frames.return_value = []
+
+    data = {
+        'video_url': 'https://example.com/test_video',
+        'video_without_language_sound': 'false'
+    }
+    response = client.post('/upload_video', data=data)
+
+    assert response.status_code == 200
+    assert b"success" in response.data
+    mock_download_video.assert_called_once_with('https://example.com/test_video', './shared_data/videos/test_video')
+    mock_get_transcript.assert_called_once_with('https://example.com/test_video', './shared_data/videos/test_video')
+    mock_extract_frames.assert_called_once()
+
+@patch('app.routes.video_service.download_video')
+@patch('app.routes.video_service.get_transcript_vtt')
+@patch('app.routes.whisper.load_model')
+@patch('app.routes.extract_and_save_frames_and_metadata')
+def test_upload_video_generate_transcript(mock_extract_frames, mock_load_model, mock_get_transcript, mock_download_video, client):
+    mock_download_video.return_value = './shared_data/videos/test_video.mp4'
+    mock_get_transcript.return_value = None
+    mock_model = MagicMock()
+    mock_load_model.return_value = mock_model
+    mock_model.transcribe.return_value = {"segments": [{"text": "test transcript"}]}
+    mock_extract_frames.return_value = []
+
+    data = {
+        'video_url': 'https://example.com/test_video',
+        'video_without_language_sound': 'false'
+    }
+    response = client.post('/upload_video', data=data)
+
+    assert response.status_code == 200
+    assert b"success" in response.data
+    mock_download_video.assert_called_once_with('https://example.com/test_video', './shared_data/videos/test_video')
+    mock_get_transcript.assert_called_once_with('https://example.com/test_video', './shared_data/videos/test_video')
+    mock_load_model.assert_called_once_with("small")
+    mock_model.transcribe.assert_called_once()
+    mock_extract_frames.assert_called_once()
+
+@patch('app.routes.video_service.download_video')
+def test_upload_video_missing_url(mock_download_video, client):
+    data = {
+        'video_without_language_sound': 'false'
+    }
+    response = client.post('/upload_video', data=data)
+
+    assert response.status_code == 400
+    assert b"video_url" in response.data
+    mock_download_video.assert_not_called()
+'''
