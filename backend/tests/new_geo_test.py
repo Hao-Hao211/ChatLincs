@@ -67,7 +67,7 @@ def test_new_search_nearby_invalid_address(mock_nominatim, setup_database):
 
     result = new_search_nearby('test_collection', address="Invalid Address", radius_km=2)
     assert 'error' in result
-    assert result['error'] == "无法找到地址: Invalid Address"
+    assert result['error'] == "Address not found: Invalid Address"
 
 @patch('app.services.new_geo.Nominatim')
 @patch('app.services.new_geo.sqlite3.connect')

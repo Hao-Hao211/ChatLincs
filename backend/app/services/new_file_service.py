@@ -58,7 +58,7 @@ def insert_file(file, collection_name, description, address=None, latitude=None,
 
     mime_type, _ = mimetypes.guess_type(file_path)
     if not mime_type:
-        raise ValueError("Cannot determine MIME file type")
+        raise ValueError("Cannot determine MIME type of file")
 
     if mime_type.startswith('image/'):
         file_type = "image"

@@ -108,15 +108,6 @@ def encode_image(image_path_or_PIL_img):
         with open(image_path_or_PIL_img, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode('utf-8')
 
-def display_retrieved_results(results):
-    print(f'There is/are {len(results)} retrieved result(s)')
-    print()
-    for i, res in enumerate(results):
-        print(f'The caption of the {str(i+1)}-th retrieved result is:\n"{results[i].page_content}"')
-        print()
-        display(Image.open(results[i].metadata['extracted_frame_path']))
-        print("------------------------------------------------------------")
-
 import ollama
 import base64
 # def encode_image(image_path):

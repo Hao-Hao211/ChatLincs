@@ -355,6 +355,7 @@ def uploaded_file(filename):
         abort(404)
     return send_from_directory(UPLOAD_FOLDER, filename)
 
+# new
 
 @api_bp.route('/upload_video', methods=['POST'])
 def upload_video():

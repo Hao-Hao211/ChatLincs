@@ -56,12 +56,12 @@ def test_create_geo_map_invalid_address(mock_geocode):
             "distance_km": 1.0,
         }
     ]
-    with pytest.raises(ValueError, match="无法找到地址: Invalid Address"):
+    with pytest.raises(ValueError, match="Address not found: Invalid Address"):
         create_geo_map(results, address="Invalid Address")
 
 
 def test_create_geo_map_no_results():
-    with pytest.raises(ValueError, match="无有效的地图数据"):
+    with pytest.raises(ValueError, match="Not valid data to create map"):
         create_geo_map([])
 
 
@@ -75,7 +75,7 @@ def test_create_empty_map_success(mock_geocode):
 @patch("app.services.new_geo_map.Nominatim.geocode")
 def test_create_empty_map_invalid_address(mock_geocode):
     mock_geocode.return_value = None
-    with pytest.raises(ValueError, match="无法找到地址: Invalid Address"):
+    with pytest.raises(ValueError, match="Address not found: Invalid Address"):
         create_empty_map(address="Invalid Address")
 
 
@@ -106,7 +106,7 @@ def test_create_empty_map_success(mock_geocode):
 @patch("app.services.new_geo_map.Nominatim.geocode")
 def test_create_empty_map_invalid_address(mock_geocode):
     mock_geocode.return_value = None
-    with pytest.raises(ValueError, match="无法找到地址: Invalid Address"):
+    with pytest.raises(ValueError, match="Address not found: Invalid Address"):
         create_empty_map(address="Invalid Address")
 
 

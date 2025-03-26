@@ -84,7 +84,7 @@ def test_add_media_to_database_invalid_address(mock_geocode, mock_connect):
     description = 'test_description'
     address = 'Invalid Address'
 
-    with pytest.raises(ValueError, match="无法找到地址: Invalid Address"):
+    with pytest.raises(ValueError, match="Address not found: Invalid Address"):
         add_media_to_database(collection_name, file_path, description, address=address)
 
     mock_connect.assert_not_called()
@@ -150,7 +150,7 @@ def test_insert_file_no_mime_type(mock_guess_type, mock_exists, mock_makedirs, m
     collection_name = 'test_collection'
     description = 'test_description'
 
-    with pytest.raises(ValueError, match="无法确定文件的 MIME 类型"):
+    with pytest.raises(ValueError, match="Cannot determine MIME type of file"):
         insert_file(file, collection_name, description)
 
     mock_client.collections.create.assert_not_called()
@@ -169,7 +169,7 @@ def test_insert_file_unsupported_mime_type(mock_guess_type, mock_exists, mock_ma
     collection_name = 'test_collection'
     description = 'test_description'
 
-    with pytest.raises(ValueError, match="不支持的文件类型"):
+    with pytest.raises(ValueError, match="Not supported file type"):
         insert_file(file, collection_name, description)
 
     mock_client.collections.create.assert_not_called()

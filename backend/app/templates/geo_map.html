@@ -25,7 +25,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_9528b528953a40ac7a5e75daaa7491c6 {
+                #map_ee6ec1d9d2d1ac2f6258735f47967a77 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -42,16 +42,16 @@
 <body>
     
     
-            <div class="folium-map" id="map_9528b528953a40ac7a5e75daaa7491c6" ></div>
+            <div class="folium-map" id="map_ee6ec1d9d2d1ac2f6258735f47967a77" ></div>
         
 </body>
 <script>
     
     
-            var map_9528b528953a40ac7a5e75daaa7491c6 = L.map(
-                "map_9528b528953a40ac7a5e75daaa7491c6",
+            var map_ee6ec1d9d2d1ac2f6258735f47967a77 = L.map(
+                "map_ee6ec1d9d2d1ac2f6258735f47967a77",
                 {
-                    center: [51.4893335, -0.14405508452768728],
+                    center: [51.5285582, -0.2416815],
                     crs: L.CRS.EPSG3857,
                     ...{
   "zoom": 14,
@@ -66,7 +66,7 @@
 
         
     
-            var tile_layer_baabb8ea4ab569cb6d5d33c13be4d53d = L.tileLayer(
+            var tile_layer_46a5e2eee29302cf7eab23bb5912fc0f = L.tileLayer(
                 "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {
   "minZoom": 0,
@@ -83,243 +83,39 @@
             );
         
     
-            tile_layer_baabb8ea4ab569cb6d5d33c13be4d53d.addTo(map_9528b528953a40ac7a5e75daaa7491c6);
+            tile_layer_46a5e2eee29302cf7eab23bb5912fc0f.addTo(map_ee6ec1d9d2d1ac2f6258735f47967a77);
         
     
-            var circle_1718c78ada970ac0ea28090202c6ff04 = L.circle(
-                [51.4893335, -0.14405508452768728],
-                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.1, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8900.0, "stroke": true, "weight": 3}
-            ).addTo(map_9528b528953a40ac7a5e75daaa7491c6);
+            var circle_ba124a3c61380f1a00f53e02f9c37592 = L.circle(
+                [51.5285582, -0.2416815],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.1, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2000.0, "stroke": true, "weight": 3}
+            ).addTo(map_ee6ec1d9d2d1ac2f6258735f47967a77);
         
     
-        var popup_03ae7a123d059281c0a12e372cdec932 = L.popup({
+        var popup_f81753d1a6e51b90303e8711905147ac = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_6dfdb45d191dc7209045dbcadd9e1ef3 = $(`<div id="html_6dfdb45d191dc7209045dbcadd9e1ef3" style="width: 100.0%; height: 100.0%;">Search radius：8.9 km</div>`)[0];
-                popup_03ae7a123d059281c0a12e372cdec932.setContent(html_6dfdb45d191dc7209045dbcadd9e1ef3);
+                var html_c9dfbd33020881f7af93fc92a1c5219d = $(`<div id="html_c9dfbd33020881f7af93fc92a1c5219d" style="width: 100.0%; height: 100.0%;">Search radius：2.0 km</div>`)[0];
+                popup_f81753d1a6e51b90303e8711905147ac.setContent(html_c9dfbd33020881f7af93fc92a1c5219d);
             
         
 
-        circle_1718c78ada970ac0ea28090202c6ff04.bindPopup(popup_03ae7a123d059281c0a12e372cdec932)
+        circle_ba124a3c61380f1a00f53e02f9c37592.bindPopup(popup_f81753d1a6e51b90303e8711905147ac)
         ;
 
         
     
     
-            var marker_cluster_ba05d5b6d8214de4fd322f1b5014ec18 = L.markerClusterGroup(
+            var marker_cluster_b5c614e174d34b1ab0e45d99e8f41be6 = L.markerClusterGroup(
                 {
 }
             );
         
     
-            var marker_c7a6e39c7781d8c3af8f40679b377223 = L.marker(
-                [51.50804895, -0.08767154999999874],
-                {
-}
-            ).addTo(marker_cluster_ba05d5b6d8214de4fd322f1b5014ec18);
-        
-    
-        var popup_e4546271a2daee5e2c6ae627acd9142a = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_a92f5140922194e44a28a1743cafe8ef = $(`<div id="html_a92f5140922194e44a28a1743cafe8ef" style="width: 100.0%; height: 100.0%;">         <b>Description：</b> The image of cat<br>         <b>Address：</b> London Bridge<br>         <b>Distance：</b> 4.43 km         <br><img src="http://127.0.0.1:5000/uploads/cat1.jpg" width="150"></div>`)[0];
-                popup_e4546271a2daee5e2c6ae627acd9142a.setContent(html_a92f5140922194e44a28a1743cafe8ef);
-            
-        
-
-        marker_c7a6e39c7781d8c3af8f40679b377223.bindPopup(popup_e4546271a2daee5e2c6ae627acd9142a)
-        ;
-
-        
-    
-    
-            marker_c7a6e39c7781d8c3af8f40679b377223.bindTooltip(
-                `<div>
-                     Click for details (4.43 km)
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var marker_9a6897714da36380bad67170ed468f67 = L.marker(
-                [51.530107, -0.15376913407968346],
-                {
-}
-            ).addTo(marker_cluster_ba05d5b6d8214de4fd322f1b5014ec18);
-        
-    
-        var popup_3c8701059cfbbc78ea713742ffc12850 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_8989ea0ce5e57443313c4df1e4365121 = $(`<div id="html_8989ea0ce5e57443313c4df1e4365121" style="width: 100.0%; height: 100.0%;">         <b>Description：</b> The image of dog<br>         <b>Address：</b> Regent's Park<br>         <b>Distance：</b> 4.59 km         <br><img src="http://127.0.0.1:5000/uploads/dog1.jpg" width="150"></div>`)[0];
-                popup_3c8701059cfbbc78ea713742ffc12850.setContent(html_8989ea0ce5e57443313c4df1e4365121);
-            
-        
-
-        marker_9a6897714da36380bad67170ed468f67.bindPopup(popup_3c8701059cfbbc78ea713742ffc12850)
-        ;
-
-        
-    
-    
-            marker_9a6897714da36380bad67170ed468f67.bindTooltip(
-                `<div>
-                     Click for details (4.59 km)
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var marker_4bb748c582527cd226563e5ba6be9b59 = L.marker(
-                [51.508037, -0.12804941070724718],
-                {
-}
-            ).addTo(marker_cluster_ba05d5b6d8214de4fd322f1b5014ec18);
-        
-    
-        var popup_d8e5f3674c7b907c31699d0efa6f15ab = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_ed701b37fd6ece6f54c3fd7c4ca55fc6 = $(`<div id="html_ed701b37fd6ece6f54c3fd7c4ca55fc6" style="width: 100.0%; height: 100.0%;">         <b>Description：</b> The audio of dog<br>         <b>Address：</b> Trafalgar Square<br>         <b>Distance：</b> 2.36 km         <br><audio controls><source src="http://127.0.0.1:5000/uploads/dog_audio.wav" type="audio/mpeg"></audio></div>`)[0];
-                popup_d8e5f3674c7b907c31699d0efa6f15ab.setContent(html_ed701b37fd6ece6f54c3fd7c4ca55fc6);
-            
-        
-
-        marker_4bb748c582527cd226563e5ba6be9b59.bindPopup(popup_d8e5f3674c7b907c31699d0efa6f15ab)
-        ;
-
-        
-    
-    
-            marker_4bb748c582527cd226563e5ba6be9b59.bindTooltip(
-                `<div>
-                     Click for details (2.36 km)
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var marker_821db23d923b203a83a7a10fc4088c66 = L.marker(
-                [51.534805649999996, -0.15480659040429015],
-                {
-}
-            ).addTo(marker_cluster_ba05d5b6d8214de4fd322f1b5014ec18);
-        
-    
-        var popup_73683a1a3b95f6e4041a237269f9440e = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_4b75cc8ebe322441494e5987270f693a = $(`<div id="html_4b75cc8ebe322441494e5987270f693a" style="width: 100.0%; height: 100.0%;">         <b>Description：</b> The image of meerkat<br>         <b>Address：</b> London Zoo<br>         <b>Distance：</b> 5.11 km         <br><img src="http://127.0.0.1:5000/uploads/meerkat2.jpg" width="150"></div>`)[0];
-                popup_73683a1a3b95f6e4041a237269f9440e.setContent(html_4b75cc8ebe322441494e5987270f693a);
-            
-        
-
-        marker_821db23d923b203a83a7a10fc4088c66.bindPopup(popup_73683a1a3b95f6e4041a237269f9440e)
-        ;
-
-        
-    
-    
-            marker_821db23d923b203a83a7a10fc4088c66.bindTooltip(
-                `<div>
-                     Click for details (5.11 km)
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var marker_0c6023fd3448e017ee03aa1bae48411a = L.marker(
-                [51.533873, -0.2054958],
-                {
-}
-            ).addTo(marker_cluster_ba05d5b6d8214de4fd322f1b5014ec18);
-        
-    
-        var popup_0cce2a9d8778005617d3f8e6fa18ace7 = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_7ca2cde11cb2b827269c879c867b3936 = $(`<div id="html_7ca2cde11cb2b827269c879c867b3936" style="width: 100.0%; height: 100.0%;">         <b>Description：</b> A cat with crown<br>         <b>Address：</b> Queen's Park<br>         <b>Distance：</b> 6.54 km         <br><img src="http://127.0.0.1:5000/uploads/cat3.jpg" width="150"></div>`)[0];
-                popup_0cce2a9d8778005617d3f8e6fa18ace7.setContent(html_7ca2cde11cb2b827269c879c867b3936);
-            
-        
-
-        marker_0c6023fd3448e017ee03aa1bae48411a.bindPopup(popup_0cce2a9d8778005617d3f8e6fa18ace7)
-        ;
-
-        
-    
-    
-            marker_0c6023fd3448e017ee03aa1bae48411a.bindTooltip(
-                `<div>
-                     Click for details (6.54 km)
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var marker_dc78800dd29f9319389dbc2e774fc6d4 = L.marker(
-                [51.5247178, -0.1385303],
-                {
-}
-            ).addTo(marker_cluster_ba05d5b6d8214de4fd322f1b5014ec18);
-        
-    
-        var popup_d21ca975aa6e50935aca1b8a9b30a2be = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_cd0d108af0902fe4ff6b2d274dd0b955 = $(`<div id="html_cd0d108af0902fe4ff6b2d274dd0b955" style="width: 100.0%; height: 100.0%;">         <b>Description：</b> A dog with free kisses<br>         <b>Address：</b> Warren Street<br>         <b>Distance：</b> 3.96 km         <br><img src="http://127.0.0.1:5000/uploads/dog2.jpg" width="150"></div>`)[0];
-                popup_d21ca975aa6e50935aca1b8a9b30a2be.setContent(html_cd0d108af0902fe4ff6b2d274dd0b955);
-            
-        
-
-        marker_dc78800dd29f9319389dbc2e774fc6d4.bindPopup(popup_d21ca975aa6e50935aca1b8a9b30a2be)
-        ;
-
-        
-    
-    
-            marker_dc78800dd29f9319389dbc2e774fc6d4.bindTooltip(
-                `<div>
-                     Click for details (3.96 km)
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            marker_cluster_ba05d5b6d8214de4fd322f1b5014ec18.addTo(map_9528b528953a40ac7a5e75daaa7491c6);
+            marker_cluster_b5c614e174d34b1ab0e45d99e8f41be6.addTo(map_ee6ec1d9d2d1ac2f6258735f47967a77);
         
 </script>
 </html>
