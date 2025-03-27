@@ -288,6 +288,7 @@ def new_upload():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 
+'''
 @api_bp.route('/new_geo_search', methods=['GET'])
 def new_geo_search():
     collection_name = request.args.get('collection_name')
@@ -310,6 +311,7 @@ def new_geo_search():
         return jsonify({"error": results["error"]}), 400
 
     return jsonify({"results": results["results"]}), 200
+'''
 
 @api_bp.route('/geo_map', methods=['GET'])
 def geo_map():
