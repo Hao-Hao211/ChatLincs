@@ -29,7 +29,7 @@ def add_media_to_database(collection_name, file_path, description, address=None,
     db_path = f'./databases/{collection_name}.db'
 
     if address:
-        geolocator = Nominatim(user_agent="geo_app")
+        geolocator = Nominatim(user_agent="chatlincs_demo_app_v2")
         location = geolocator.geocode(address)
         if location:
             latitude, longitude = location.latitude, location.longitude

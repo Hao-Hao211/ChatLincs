@@ -9,7 +9,7 @@ def create_geo_map(results, center_lat=None, center_lon=None, address=None, radi
     if not results:
         raise ValueError("Not valid data to create map")
 
-    geolocator = Nominatim(user_agent="geo_app")
+    geolocator = Nominatim(user_agent="chatlincs_demo_app_v2")
     if address:
         location = geolocator.geocode(address)
         if location:
