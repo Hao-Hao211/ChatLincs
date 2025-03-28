@@ -107,7 +107,7 @@ def bt_embedding_local2(prompt, base64_image):
 
     MAX_LENGTH = 400
     tokens = processor.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=MAX_LENGTH)
-    prompt = processor.tokenizer.decode(tokens["input_ids"][0])  # 重新生成裁剪后的 prompt
+    prompt = processor.tokenizer.decode(tokens["input_ids"][0])
 
     message = {"text": prompt}
     image = None
