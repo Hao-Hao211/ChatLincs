@@ -7,6 +7,7 @@ Dependencies for testing:
 ```
 pip install pytest
 pip install pytest-cov
+pip install pytest-asyncio
 ```
 
 To run all tests:

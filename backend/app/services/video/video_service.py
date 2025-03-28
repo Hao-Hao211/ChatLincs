@@ -44,7 +44,7 @@ def get_video_id_from_url(video_url):
             return url.path.split('/')[2]
 
     return video_url
-
+'''
 def download_video_with_filecheck(video_url, path='/tmp/'):
     print(f'Getting video information for {video_url}')
     if not video_url.startswith('http'):
@@ -70,7 +70,7 @@ def download_video_with_filecheck(video_url, path='/tmp/'):
         stream.download(path)
         pbar.close()
     return filepath
-
+'''
 def download_video(video_url, path='/tmp/'):
     print(f'Getting video information for {video_url}')
     if not video_url.startswith('http'):
@@ -302,12 +302,14 @@ def extract_and_save_frames_and_metadata_with_fps(
         json.dump(metadatas, outfile)
     return metadatas
 
+'''
 def extract_audio_and_transcribe(video_filepath, audio_output_path):
     clip = VideoFileClip(video_filepath)
     clip.audio.write_audiofile(audio_output_path)
     model = whisper.load_model("small")
     result = model.transcribe(audio_output_path, task="translate", language='en')
     return result["text"], result["segments"]
+
 
 def extract_and_save_frames(
         path_to_video,
@@ -378,7 +380,7 @@ def embed_and_store_multimodal(metadata, lancedb_host, table_name, mode="append"
         table_name=table_name,
         mode=mode
     )
-
+'''
 def get_youtube_title(video_url):
     ydl_opts = {'quiet': True}
     with YoutubeDL(ydl_opts) as ydl:

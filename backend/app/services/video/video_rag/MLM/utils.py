@@ -1,7 +1,7 @@
 from typing import Iterator, TextIO, List, Dict, Any, Optional, Sequence, Union
 import base64
-from urllib.request import urlopen
 import requests
+from urllib.request import urlopen
 from langchain_core.prompt_values import PromptValue
 from langchain_core.messages import (
     MessageLikeRepresentation,
