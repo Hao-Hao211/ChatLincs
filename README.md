@@ -1,6 +1,6 @@
 # 🌍 ChatLincs: Multimodal RAG Platform
 
-**Team 12** **–** **NTT Data – Monitoring and Engagement Tracking for Impact Reports**
+**NTT Data – Monitoring and Engagement Tracking for Impact Reports**
 
 ---
 
